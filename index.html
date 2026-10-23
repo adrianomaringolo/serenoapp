@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1420" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Sereno</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Nunito+Sans:wght@400;600&display=swap" />
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">
+    { "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+  </script>
+</head>
+<body>
+  <div id="scene"></div>
+
+  <div id="hud" class="hud hidden">
+    <header class="brand">
+      <div class="brand-name">Sereno</div>
+      <div class="brand-env" id="env-name">Jardim Zen</div>
+    </header>
+
+    <nav class="top-actions">
+      <button class="pill" id="btn-time" title="Momento do dia (T)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+        <span id="time-label">Entardecer</span>
+      </button>
+      <button class="icon" id="btn-breathe" title="Respiração guiada (B)">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/></svg>
+      </button>
+      <div class="pop-wrap">
+        <button class="icon" id="btn-sound" title="Som">
+          <svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+        </button>
+        <div class="pop" id="pop-sound" hidden>
+          <label>Música <input type="range" id="vol-music" min="0" max="1" step="0.01" value="0.6" /></label>
+          <label>Natureza (pássaros e grilos) <input type="range" id="vol-nature" min="0" max="1" step="0.01" value="0.7" /></label>
+          <label>Ruído de fundo (vento e correnteza) <input type="range" id="vol-noise" min="0" max="1" step="0.01" value="0.6" /></label>
+          <button class="text-btn" id="btn-mute">Silenciar tudo</button>
+        </div>
+      </div>
+      <div class="pop-wrap">
+        <button class="icon" id="btn-view" title="Ponto de vista (C caminha)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>
+        </button>
+        <div class="pop" id="pop-view" hidden>
+          <div class="pop-title">Ponto de vista</div>
+          <div class="view-modes">
+            <button class="ph-chip on" id="view-orbit">Orbitar</button>
+            <button class="ph-chip" id="view-walk">Caminhar (C)</button>
+          </div>
+          <div class="pop-sep"></div>
+          <div class="pop-title">Ir para</div>
+          <div id="view-points" class="view-points"></div>
+          <button class="ph-chip" id="view-markers">Marcadores no cenário</button>
+          <p class="ph-tip">Toque nos pontos de luz do cenário para ir até eles, ou dê dois cliques (dois toques) em qualquer lugar.</p>
+        </div>
+      </div>
+      <button class="icon" id="btn-photo" title="Modo foto (F)">
+        <svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+      </button>
+      <button class="icon" id="btn-gallery" title="Galeria (G)">
+        <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 16l5-5 4 4 2.5-2.5 5.5 5.5"/><circle cx="15.5" cy="9.5" r="1.4"/></svg>
+      </button>
+      <button class="icon" id="btn-zen" title="Contemplar — esconde a interface (Z)">
+        <svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg>
+      </button>
+      <div class="pop-wrap">
+        <button class="icon" id="btn-menu" title="Mais">
+          <svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/></svg>
+        </button>
+        <div class="pop" id="pop-menu" hidden>
+          <div class="pop-title">Ambientes</div>
+          <div id="env-list"></div>
+          <div class="pop-sep"></div>
+          <button class="text-btn" id="btn-rerake">Rastelar a areia de novo</button>
+          <button class="text-btn" id="btn-reset">Restaurar o jardim original</button>
+          <button class="text-btn" id="btn-help">Como interagir</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="selection" id="selection" hidden>
+      <span class="sel-name" id="sel-name"></span>
+      <button class="icon small" id="btn-rot-l" title="Girar (Q)"><svg viewBox="0 0 24 24"><path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 3.5v4h4"/></svg></button>
+      <button class="icon small" id="btn-rot-r" title="Girar (E)"><svg viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5"/><path d="M19 3.5v4h-4"/></svg></button>
+      <button class="icon small" id="btn-remove" title="Tirar do jardim (Delete)"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg></button>
+    </div>
+
+    <div class="hint" id="hint"></div>
+
+    <div class="toolbar">
+      <div class="tools">
+        <button class="tool active" data-mode="move" title="Mover objetos (M)">
+          <svg viewBox="0 0 24 24"><path d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10m0-.5V4a1.5 1.5 0 0 1 3 0v6m0-4.5a1.5 1.5 0 0 1 3 0V12m0-3.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-5-2.7L4 14.5a1.6 1.6 0 0 1 2.5-2L8 14"/></svg>
+          <span>Mover</span>
+        </button>
+        <button class="tool" data-mode="rake" title="Rastelar a areia (R)">
+          <svg viewBox="0 0 24 24"><path d="M3 20c4-3 6-3 9 0s5 3 9 0M3 15c4-3 6-3 9 0s5 3 9 0"/><path d="M12 3v7M8 10h8M8 10v2M12 10v2M16 10v2"/></svg>
+          <span>Rastelar</span>
+        </button>
+      </div>
+      <div class="sep"></div>
+      <div class="catalog" id="catalog"></div>
+      <div class="item-count" id="item-count" title="Objetos no cenário"></div>
+    </div>
+  </div>
+
+  <div id="breath" class="breath" hidden>
+    <div class="breath-ring"><div class="breath-orb" id="breath-orb"></div></div>
+    <div class="breath-label" id="breath-label">Inspire</div>
+    <div class="breath-timer" id="breath-timer"></div>
+    <div class="breath-controls">
+      <select id="breath-pattern" aria-label="Ritmo">
+        <option value="calma">Calma · 4 – 6</option>
+        <option value="quadrada">Quadrada · 4 – 4 – 4 – 4</option>
+        <option value="478">Relaxar · 4 – 7 – 8</option>
+      </select>
+      <select id="breath-length" aria-label="Duração">
+        <option value="0">Sem tempo</option>
+        <option value="300">5 minutos</option>
+        <option value="600">10 minutos</option>
+        <option value="900">15 minutos</option>
+      </select>
+      <button class="text-btn" id="breath-close">Encerrar</button>
+    </div>
+  </div>
+
+  <div id="zen-exit" class="zen-exit" hidden>toque para voltar</div>
+
+  <div id="vp-label" class="vp-label"></div>
+
+  <div id="walk-bar" class="walk-bar" hidden>
+    <span>Caminhando</span>
+    <button class="pill" id="walk-exit">Voltar a orbitar</button>
+  </div>
+
+  <div id="help" class="help" hidden>
+    <div class="help-card">
+      <h2>Como interagir</h2>
+      <ul>
+        <li><b>Olhar em volta</b> — arraste no cenário; role ou faça pinça para aproximar. Dois cliques (ou dois toques) em qualquer ponto levam a vista até ali.</li>
+        <li><b>Ponto de vista</b> (bússola) — escolha um lugar pronto ou <b>caminhe</b> (C) pelo cenário na altura dos olhos: arraste para olhar, WASD ou toque no chão para andar.</li>
+        <li><b>Mover</b> — arraste uma pedra, lanterna ou planta. Role a rodinha (ou Q / E) para girar.</li>
+        <li><b>Adicionar</b> — escolha um objeto embaixo e toque onde quer colocá-lo. A lótus só flutua no lago; no riacho, lanternas e barquinhos de papel descem a correnteza até o poço.</li>
+        <li><b>Rastelar</b> — com o rastelo, desenhe sulcos na areia.</li>
+        <li><b>Água e bambu</b> — toque no lago para fazer ondas (as carpas vêm ver) e no bambu para fazê-lo bater.</li>
+        <li><b>Respirar</b> — o círculo guia a respiração; escolha o ritmo e a duração.</li>
+        <li><b>Fotografar</b> (F) — câmera livre: arraste para olhar, WASD anda, Q/E desce e sobe. Toque para focar, ajuste lente e abertura e aperte o obturador. As fotos ficam na galeria (G), só neste aparelho.</li>
+      </ul>
+      <button class="text-btn" id="help-close">Entendi</button>
+    </div>
+  </div>
+
+  <div id="photo" class="photo" hidden>
+    <div class="ph-grid" id="ph-grid-overlay" hidden><i></i><i></i><i></i><i></i></div>
+    <div class="ph-reticle" id="ph-reticle"></div>
+    <div class="ph-flash" id="ph-flash"></div>
+    <div class="ph-top">
+      <span class="ph-title">Modo foto</span>
+      <div class="ph-times" id="ph-times"></div>
+      <button class="pill" id="ph-exit" title="Sair (Esc)">Sair</button>
+    </div>
+    <div class="ph-panel">
+      <button class="ph-panel-toggle" id="ph-panel-toggle" title="Mostrar/esconder ajustes">
+        <svg viewBox="0 0 24 24"><path d="M5 7h10M19 7h0M5 12h4M13 12h6M5 17h12M21 17h0"/><circle cx="17" cy="7" r="2"/><circle cx="11" cy="12" r="2"/><circle cx="19" cy="17" r="2"/></svg>
+      </button>
+      <div class="ph-controls">
+        <label>Lente <output id="ph-lens-v"></output><input type="range" id="ph-lens" min="0" max="1000" /></label>
+        <label>Foco <output id="ph-focus-v"></output><input type="range" id="ph-focus" min="0" max="1000" /></label>
+        <label>Abertura <output id="ph-fstop-v"></output><input type="range" id="ph-fstop" min="0" max="7" step="1" /></label>
+        <label>Exposição <output id="ph-ev-v"></output><input type="range" id="ph-ev" min="-2" max="2" step="0.1" /></label>
+        <label>Horizonte <output id="ph-roll-v"></output><input type="range" id="ph-roll" min="-30" max="30" step="1" /></label>
+        <div class="ph-toggles">
+          <button class="ph-chip" id="ph-grid">Grade</button>
+          <button class="ph-chip" id="ph-pause">Pausar o tempo</button>
+        </div>
+        <p class="ph-tip">Toque na cena para focar naquele ponto.</p>
+      </div>
+    </div>
+    <div class="ph-bottom">
+      <button class="ph-gallery" id="ph-gallery" title="Galeria"></button>
+      <button class="ph-shutter" id="ph-shutter" title="Fotografar (Enter)"><span></span></button>
+      <div class="ph-spacer"></div>
+    </div>
+    <div class="ph-hint" id="ph-hint"></div>
+  </div>
+
+  <div id="gallery" class="gallery" hidden>
+    <div class="gal-head">
+      <div><h2>Galeria</h2><span id="gal-count"></span></div>
+      <button class="pill" id="gal-close">Fechar</button>
+    </div>
+    <p class="gal-empty" id="gal-empty">Nenhuma foto ainda. Entre no modo foto <b>(F)</b> e capture um momento do jardim.</p>
+    <div class="gal-grid" id="gal-grid"></div>
+    <div class="gal-viewer" id="gal-viewer" hidden>
+      <img id="gal-img" alt="" />
+      <button class="gal-nav prev" id="gal-prev" title="Anterior">‹</button>
+      <button class="gal-nav next" id="gal-next" title="Próxima">›</button>
+      <div class="gal-bar">
+        <div class="gal-info" id="gal-info"></div>
+        <div class="gal-actions">
+          <button class="pill" id="gal-download">Baixar</button>
+          <button class="pill" id="gal-share">Compartilhar</button>
+          <button class="pill danger" id="gal-delete">Apagar</button>
+          <button class="pill" id="gal-v-close">Voltar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="intro" class="intro">
+    <div class="intro-inner">
+      <div class="intro-mark"></div>
+      <h1>Sereno</h1>
+      <p class="intro-sub">Um jardim para desacelerar.</p>
+      <div class="intro-envs" id="intro-envs" role="radiogroup" aria-label="Ambiente"></div>
+      <p class="intro-env-desc" id="intro-env-desc"></p>
+      <div class="intro-progress"><div id="intro-bar"></div></div>
+      <button id="intro-enter" class="enter" disabled>Preparando o jardim…</button>
+      <p class="intro-tip">Use fones de ouvido para uma imersão completa.</p>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

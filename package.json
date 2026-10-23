@@ -1,0 +1,16 @@
+{
+  "name": "sereno",
+  "version": "0.1.0",
+  "description": "Ambientes de medita\u00e7\u00e3o interativos feitos com three.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "foto": "node scripts/foto.js",
+    "bench": "node scripts/bench.js",
+    "dist": "node scripts/dist.js"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  }
+}
